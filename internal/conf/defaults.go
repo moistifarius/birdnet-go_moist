@@ -176,6 +176,9 @@ func setDefaultConfig() {
 	viper.SetDefault("realtime.dashboard.defaultaudiogain", 0.0)      // Default playback gain in dB (no boost)
 	viper.SetDefault("realtime.dashboard.livespectrogram", false)     // Auto-start live spectrogram on dashboard
 
+	// Identification-check verdict configuration
+	viper.SetDefault("realtime.identificationcheck.enabled", true) // Show plain-language ID-check verdicts
+
 	// Spectrogram pre-rendering configuration
 	viper.SetDefault("realtime.dashboard.spectrogram.enabled", false)                                // Opt-in for safety
 	viper.SetDefault("realtime.dashboard.spectrogram.mode", "auto")                                  // Default to auto mode (generate on demand)

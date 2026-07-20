@@ -1,4 +1,54 @@
 {
+  "idCheck": {
+    "title": "Identification check",
+    "loading": "Checking this identification…",
+    "badge": {
+      "strong": "Strong support",
+      "mixed": "Mixed evidence",
+      "weak": "Weak support"
+    },
+    "verdict": {
+      "strong": {
+        "title": "Strong support"
+      },
+      "mixed": {
+        "title": "Mixed evidence"
+      },
+      "weak": {
+        "title": "Weak support",
+        "note": "You should review this detection."
+      }
+    },
+    "signal": {
+      "sound_clarity": {
+        "pass": "The detection was clear and confident.",
+        "neutral": "The detection was moderately clear.",
+        "warn": "The detection was faint or uncertain."
+      },
+      "expected_here": {
+        "pass": "This bird is expected in your area now.",
+        "neutral": "This bird is uncommon in your area.",
+        "warn": "This bird is unusual in your area right now.",
+        "unknown": "Local expectedness couldn't be checked."
+      },
+      "heard_often": {
+        "pass": "It was heard several times today.",
+        "neutral": "It was heard a couple of times today.",
+        "warn": "It was detected only once today."
+      },
+      "recording_quality": {
+        "warn": "The recording may be low quality or out of range."
+      }
+    },
+    "expertDetails": "Details for experts",
+    "details": {
+      "confidence": "Detection confidence",
+      "expectedness": "Expected here now",
+      "timesHeard": "Times heard today",
+      "model": "Recognizer",
+      "notChecked": "Not checked"
+    }
+  },
   "common": {
     "loading": "Laster...",
     "error": "Feil",

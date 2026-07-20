@@ -42,6 +42,35 @@ export interface Detection {
   currentSeason?: string; // Current season name
 }
 
+// Identification check ("ID check") — a plain-language verdict computed by the
+// backend from local signals (GET /api/v2/detections/:id/id-check). It is a
+// read-only decision aid, distinct from the human `verified` review status.
+export type IdCheckVerdict = 'strong' | 'mixed' | 'weak';
+export type IdCheckSignalStatus = 'pass' | 'warn' | 'neutral' | 'unknown';
+export type IdCheckSignalCode =
+  'sound_clarity' | 'expected_here' | 'heard_often' | 'recording_quality';
+
+export interface IdCheckSignal {
+  code: IdCheckSignalCode;
+  status: IdCheckSignalStatus;
+}
+
+export interface IdCheckDetails {
+  confidence: number;
+  locationConfigured: boolean;
+  occurrence?: number;
+  dailyCount: number;
+  flaggedUnlikely: boolean;
+  modelType?: string;
+}
+
+export interface IdCheckResult {
+  enabled: boolean;
+  verdict?: IdCheckVerdict;
+  signals?: IdCheckSignal[];
+  details?: IdCheckDetails;
+}
+
 export interface PaginatedDetectionResponse {
   data: Detection[];
   total: number;

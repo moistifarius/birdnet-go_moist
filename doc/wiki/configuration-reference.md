@@ -310,6 +310,7 @@ RealtimeSettings contains all settings related to realtime processing.
 | `realtime.extendedcapture.maxduration` | integer |  |
 | `realtime.extendedcapture.capturebufferseconds` | integer |  |
 | `realtime.extendedcapture.species` | string[] |  |
+| `realtime.identificationcheck.enabled` | boolean | true to compute and expose the identification-check verdict (default: true) |
 
 ## webserver
 

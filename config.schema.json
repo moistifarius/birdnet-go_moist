@@ -1028,6 +1028,17 @@
       "type": "object",
       "description": "HomeAssistantSettings contains settings for Home Assistant MQTT auto-discovery."
     },
+    "IdentificationCheckSettings": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to compute and expose the identification-check verdict (default: true)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "IdentificationCheckSettings controls the identification-check feature, which surfaces a plain-language \"strong / mixed / weak support\" verdict for each detection computed from local signals (confidence, species expectedness, and how often the species was heard)."
+    },
     "ImportConfig": {
       "properties": {
         "allowinappelevation": {
@@ -1873,6 +1884,10 @@
         "extendedcapture": {
           "$ref": "#/$defs/ExtendedCaptureSettings",
           "description": "Extended capture for long calling species"
+        },
+        "identificationcheck": {
+          "$ref": "#/$defs/IdentificationCheckSettings",
+          "description": "Plain-language identification-check verdict settings"
         }
       },
       "additionalProperties": false,

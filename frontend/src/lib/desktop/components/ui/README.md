@@ -33,6 +33,8 @@ A comprehensive collection of reusable Svelte 5 components for the BirdNET-Go de
 - [EmptyState](#emptystate) - Empty content placeholder
 - [ErrorAlert](#erroralert) - Error and notification messages
 - [NotificationToast](#notificationtoast) - Toast notifications
+- [IdCheckBadge](#idcheckbadge) - Compact identification-check verdict pill for cards
+- [IdCheckPanel](#idcheckpanel) - Detailed identification-check verdict with reasons and expert details
 
 ### Navigation & Interaction
 
@@ -513,6 +515,50 @@ interface Props {
   onDelete={() => actions.handleDelete(detection)}
   onDownload={handleDownload}
 />
+```
+
+---
+
+### IdCheckBadge
+
+Compact "identification check" verdict pill (Strong / Mixed / Weak support) for detection cards. Lazily fetches the verdict from `GET /api/v2/detections/:id/id-check` only when the card is visible, caches per detection for the session, and renders nothing when the feature is disabled or the fetch fails. Uses words + an icon (not color alone). It is a read-only decision aid, distinct from the human `verified` review status.
+
+**Props:**
+
+```ts
+interface Props {
+  detectionId: number;
+  visible?: boolean; // only fetch/show once the card is visible (default true)
+  size?: StatusSize; // 'xs' | 'sm' | 'md'
+  className?: string;
+}
+```
+
+**Example:**
+
+```svelte
+<IdCheckBadge detectionId={detection.id} visible={isVisible} size="xs" />
+```
+
+---
+
+### IdCheckPanel
+
+Full identification-check panel for the detection detail view: a plain-language verdict, a short reason per signal (words + icons), and a collapsed "Details for experts" section with the raw numbers (confidence, expectedness, times heard). Fetches on mount and degrades quietly — nothing renders while the feature is disabled or the fetch fails.
+
+**Props:**
+
+```ts
+interface Props {
+  detectionId: number;
+  className?: string; // applied to the panel card (e.g. "surface-card p-5 md:p-6")
+}
+```
+
+**Example:**
+
+```svelte
+<IdCheckPanel detectionId={detection.id} className="surface-card p-5 md:p-6" />
 ```
 
 ---

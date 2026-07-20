@@ -23,6 +23,7 @@
   import SourceBadge from './SourceBadge.svelte';
   import PlayOverlay from './PlayOverlay.svelte';
   import SpeciesInfoBar from './SpeciesInfoBar.svelte';
+  import IdCheckBadge from '$lib/desktop/components/ui/IdCheckBadge.svelte';
   import ActionMenu from '$lib/desktop/components/ui/ActionMenu.svelte';
   import AudioSettingsButton from './AudioSettingsButton.svelte';
   import { cn } from '$lib/utils/cn';
@@ -205,8 +206,9 @@
     {/if}
 
     <!-- Top-Left Badges: Confidence + Weather -->
-    <div class="absolute top-3 left-3 flex items-center gap-2 z-10">
+    <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2 z-10">
       <ConfidenceBadge confidence={detection.confidence} />
+      <IdCheckBadge detectionId={detection.id} visible={isVisible} size="xs" />
       {#if detection.weather?.weatherIcon}
         <WeatherBadge
           weatherIcon={detection.weather.weatherIcon}
