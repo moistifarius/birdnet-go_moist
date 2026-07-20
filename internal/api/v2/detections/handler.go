@@ -33,6 +33,7 @@ import (
 
 	"github.com/tphakala/birdnet-go/internal/api/v2/apicore"
 	"github.com/tphakala/birdnet-go/internal/conf"
+	"github.com/tphakala/birdnet-go/internal/reference"
 )
 
 // queryValueTrue is the canonical "true" query-parameter value parsed by the
@@ -70,6 +71,14 @@ type Handler struct {
 	isClientAuthenticated     func(ctx echo.Context) bool
 	loadCommonNameMap         func() map[string]string
 	loadCommonToScientificMap func() map[string]string
+
+	// Reference-recording ("trusted example") client, built lazily and rebuilt
+	// when the Xeno-canto API key changes so the per-species cache survives while
+	// the key is stable. referenceDoer overrides the HTTP transport in tests.
+	refMu         sync.Mutex
+	refClient     *reference.Client
+	refKey        string
+	referenceDoer reference.Doer
 }
 
 // New constructs the detections domain handler around the shared core and the
@@ -146,6 +155,8 @@ func (c *Handler) RegisterDetectionRoutes(g *echo.Group) {
 	g.GET("/detections/:id", c.GetDetection)
 	g.GET("/detections/recent", c.GetRecentDetections)
 	g.GET("/detections/:id/time-of-day", c.GetDetectionTimeOfDay)
+	g.GET("/detections/:id/id-check", c.GetDetectionIDCheck)
+	g.GET("/detections/:id/reference", c.GetDetectionReference)
 
 	// Protected detection management endpoints
 	detectionGroup := g.Group("/detections", c.AuthMiddleware)

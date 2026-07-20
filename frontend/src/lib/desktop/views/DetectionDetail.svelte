@@ -19,6 +19,8 @@
   import WeatherDetails from '$lib/desktop/components/data/WeatherDetails.svelte';
   import AudioPlayer from '$lib/desktop/components/media/AudioPlayer.svelte';
   import VerificationBadges from '$lib/desktop/components/ui/VerificationBadges.svelte';
+  import IdCheckPanel from '$lib/desktop/components/ui/IdCheckPanel.svelte';
+  import TrustedExample from '$lib/desktop/components/media/TrustedExample.svelte';
   import ErrorAlert from '$lib/desktop/components/ui/ErrorAlert.svelte';
   import { handleBirdImageError } from '$lib/desktop/components/ui/image-utils.js';
   import { t } from '$lib/i18n';
@@ -886,6 +888,12 @@
         </div>
       </section>
     {/if}
+
+    <!-- Identification check verdict (renders nothing when disabled or unavailable) -->
+    <IdCheckPanel detectionId={detection.id} className="surface-card p-5 md:p-6" />
+
+    <!-- Trusted example reference recording (renders nothing when disabled or unavailable) -->
+    <TrustedExample detectionId={detection.id} className="surface-card p-5 md:p-6" />
 
     <!-- Tabbed Content -->
     <section class="surface-card" aria-labelledby="tabs-heading">

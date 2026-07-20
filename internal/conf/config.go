@@ -839,6 +839,26 @@ type RealtimeSettings struct {
 	Weather          WeatherSettings          `yaml:"weather" json:"weather"`                   // Weather provider related settings
 	SpeciesTracking  SpeciesTrackingSettings  `yaml:"speciestracking" json:"speciesTracking"`   // New species tracking settings
 	ExtendedCapture  ExtendedCaptureSettings  `yaml:"extendedcapture" json:"extendedCapture"`   // Extended capture for long calling species
+
+	IdentificationCheck IdentificationCheckSettings `yaml:"identificationcheck" json:"identificationCheck"` // Plain-language identification-check verdict settings
+}
+
+// IdentificationCheckSettings controls the identification-check feature, which
+// surfaces a plain-language "strong / mixed / weak support" verdict for each
+// detection computed from local signals (confidence, species expectedness, and
+// how often the species was heard). It is read per request so changes take
+// effect without a restart.
+type IdentificationCheckSettings struct {
+	Enabled   bool              `yaml:"enabled" json:"enabled"`     // true to compute and expose the identification-check verdict (default: true)
+	Xenocanto XenocantoSettings `yaml:"xenocanto" json:"xenocanto"` // Xeno-canto reference-recording ("trusted example") source
+}
+
+// XenocantoSettings configures the Xeno-canto reference-recording source used to
+// fetch a "trusted example" for a species. It requires a free Xeno-canto API
+// key; without one the source stays disabled. Read per request for hot-reload.
+type XenocantoSettings struct {
+	Enabled bool   `yaml:"enabled" json:"enabled"` // true to fetch reference recordings from Xeno-canto
+	APIKey  string `yaml:"apikey" json:"apiKey"`   // Xeno-canto API v3 key (secret; redacted over the API)
 }
 
 // SpeciesAction represents a single action configuration

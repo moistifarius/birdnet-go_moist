@@ -83,6 +83,7 @@ This folder contains **shared components** used across the application. Feature-
 
 - `AudioPlayer.svelte` - Audio playback controls with spectrogram
 - `SpectrogramPlayer.svelte` - Compact spectrogram player for table rows (play overlay + progress bar)
+- `TrustedExample.svelte` - Plays the closest Xeno-canto "trusted example" for a species with attribution and "try another example"; renders nothing when disabled/unavailable
 
 ## Modals
 

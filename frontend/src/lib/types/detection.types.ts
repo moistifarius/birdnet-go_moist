@@ -42,6 +42,59 @@ export interface Detection {
   currentSeason?: string; // Current season name
 }
 
+// Identification check ("ID check") — a plain-language verdict computed by the
+// backend from local signals (GET /api/v2/detections/:id/id-check). It is a
+// read-only decision aid, distinct from the human `verified` review status.
+export type IdCheckVerdict = 'strong' | 'mixed' | 'weak';
+export type IdCheckSignalStatus = 'pass' | 'warn' | 'neutral' | 'unknown';
+export type IdCheckSignalCode =
+  'sound_clarity' | 'expected_here' | 'heard_often' | 'recording_quality';
+
+export interface IdCheckSignal {
+  code: IdCheckSignalCode;
+  status: IdCheckSignalStatus;
+}
+
+export interface IdCheckDetails {
+  confidence: number;
+  locationConfigured: boolean;
+  occurrence?: number;
+  dailyCount: number;
+  flaggedUnlikely: boolean;
+  modelType?: string;
+}
+
+export interface IdCheckResult {
+  enabled: boolean;
+  verdict?: IdCheckVerdict;
+  signals?: IdCheckSignal[];
+  details?: IdCheckDetails;
+}
+
+// Reference recording ("trusted example") — a known-good example for a species
+// from an external catalog (Xeno-canto), served by GET /detections/:id/reference.
+export interface ReferenceRecording {
+  id: string;
+  scientificName?: string;
+  commonName?: string;
+  recordist?: string;
+  country?: string;
+  callType?: string;
+  pageUrl?: string;
+  audioUrl?: string;
+  licenseName?: string;
+  licenseUrl?: string;
+  quality?: string;
+  length?: string;
+  sourceProvider?: string;
+}
+
+export interface ReferenceResult {
+  enabled: boolean;
+  best?: ReferenceRecording;
+  alternatives?: ReferenceRecording[];
+}
+
 export interface PaginatedDetectionResponse {
   data: Detection[];
   total: number;

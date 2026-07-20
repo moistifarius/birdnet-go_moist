@@ -310,6 +310,9 @@ RealtimeSettings contains all settings related to realtime processing.
 | `realtime.extendedcapture.maxduration` | integer |  |
 | `realtime.extendedcapture.capturebufferseconds` | integer |  |
 | `realtime.extendedcapture.species` | string[] |  |
+| `realtime.identificationcheck.enabled` | boolean | true to compute and expose the identification-check verdict (default: true) |
+| `realtime.identificationcheck.xenocanto.enabled` | boolean | true to fetch reference recordings from Xeno-canto |
+| `realtime.identificationcheck.xenocanto.apikey` | string | Xeno-canto API v3 key (secret; redacted over the API) |
 
 ## webserver
 

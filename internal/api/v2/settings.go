@@ -1777,6 +1777,9 @@ func sanitizeSettingsForAPI(s *conf.Settings) *conf.Settings {
 	// --- eBird API key ---
 	sanitized.Realtime.EBird.APIKey = redact(s.Realtime.EBird.APIKey)
 
+	// --- Xeno-canto API key ---
+	sanitized.Realtime.IdentificationCheck.Xenocanto.APIKey = redact(s.Realtime.IdentificationCheck.Xenocanto.APIKey)
+
 	// --- Backup secrets ---
 	sanitized.Backup.EncryptionKey = redact(s.Backup.EncryptionKey)
 
@@ -1888,6 +1891,9 @@ func restoreRedactedSecrets(current, incoming *conf.Settings) error {
 	// eBird
 	restore(&current.Realtime.EBird.APIKey, &incoming.Realtime.EBird.APIKey)
 
+	// Xeno-canto
+	restore(&current.Realtime.IdentificationCheck.Xenocanto.APIKey, &incoming.Realtime.IdentificationCheck.Xenocanto.APIKey)
+
 	// Backup
 	restore(&current.Backup.EncryptionKey, &incoming.Backup.EncryptionKey)
 
@@ -1978,6 +1984,7 @@ func validateNoRedactedSentinels(s *conf.Settings) error {
 	check(s.Realtime.Weather.OpenWeather.APIKey, "realtime.weather.openWeather.apiKey")
 	check(s.Realtime.Weather.Wunderground.APIKey, "realtime.weather.wunderground.apiKey")
 	check(s.Realtime.EBird.APIKey, "realtime.ebird.apiKey")
+	check(s.Realtime.IdentificationCheck.Xenocanto.APIKey, "realtime.identificationCheck.xenocanto.apiKey")
 	check(s.Backup.EncryptionKey, "backup.encryptionKey")
 
 	// Array-based OAuth providers
@@ -2045,6 +2052,7 @@ func clearRedactedSentinels(s *conf.Settings) {
 	clearField(&s.Realtime.Weather.OpenWeather.APIKey)
 	clearField(&s.Realtime.Weather.Wunderground.APIKey)
 	clearField(&s.Realtime.EBird.APIKey)
+	clearField(&s.Realtime.IdentificationCheck.Xenocanto.APIKey)
 	clearField(&s.Backup.EncryptionKey)
 
 	for i := range s.Security.OAuthProviders {

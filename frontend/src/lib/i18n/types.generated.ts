@@ -10,6 +10,39 @@
  * All available translation keys
  */
 export type TranslationKey =
+  | 'idCheck.title'
+  | 'idCheck.loading'
+  | 'idCheck.badge.strong'
+  | 'idCheck.badge.mixed'
+  | 'idCheck.badge.weak'
+  | 'idCheck.verdict.strong.title'
+  | 'idCheck.verdict.mixed.title'
+  | 'idCheck.verdict.weak.title'
+  | 'idCheck.verdict.weak.note'
+  | 'idCheck.signal.sound_clarity.pass'
+  | 'idCheck.signal.sound_clarity.neutral'
+  | 'idCheck.signal.sound_clarity.warn'
+  | 'idCheck.signal.expected_here.pass'
+  | 'idCheck.signal.expected_here.neutral'
+  | 'idCheck.signal.expected_here.warn'
+  | 'idCheck.signal.expected_here.unknown'
+  | 'idCheck.signal.heard_often.pass'
+  | 'idCheck.signal.heard_often.neutral'
+  | 'idCheck.signal.heard_often.warn'
+  | 'idCheck.signal.recording_quality.warn'
+  | 'idCheck.expertDetails'
+  | 'idCheck.details.confidence'
+  | 'idCheck.details.expectedness'
+  | 'idCheck.details.timesHeard'
+  | 'idCheck.details.model'
+  | 'idCheck.details.notChecked'
+  | 'reference.title'
+  | 'reference.loading'
+  | 'reference.tryAnother'
+  | 'reference.attribution' // params: source, recordist
+  | 'reference.attributionNoRecordist' // params: source
+  | 'reference.viewSource'
+  | 'reference.audioAria' // params: source
   | 'common.loading'
   | 'common.error'
   | 'common.unknown'
@@ -2373,6 +2406,17 @@ export type TranslationKey =
   | 'settings.integration.errors.responseStreamFailed'
   | 'settings.integration.errors.configurationCheck'
   | 'settings.integration.errors.testStageFallback'
+  | 'settings.integration.identificationCheck.title'
+  | 'settings.integration.identificationCheck.description'
+  | 'settings.integration.identificationCheck.enable'
+  | 'settings.integration.identificationCheck.enableHelp'
+  | 'settings.integration.identificationCheck.xenocanto.enable'
+  | 'settings.integration.identificationCheck.xenocanto.enableHelp'
+  | 'settings.integration.identificationCheck.xenocanto.enabledRequired'
+  | 'settings.integration.identificationCheck.xenocanto.apiKeyInfo'
+  | 'settings.integration.identificationCheck.xenocanto.apiKey.label'
+  | 'settings.integration.identificationCheck.xenocanto.apiKey.helpText'
+  | 'settings.integration.identificationCheck.xenocanto.note'
   | 'settings.integration.ebird.title'
   | 'settings.integration.ebird.description'
   | 'settings.integration.ebird.enable'
@@ -3986,6 +4030,9 @@ export type TranslationKey =
  * Parameter types for translations that require parameters
  */
 export type TranslationParams = {
+  'reference.attribution': { source: string | number; recordist: string | number };
+  'reference.attributionNoRecordist': { source: string | number };
+  'reference.audioAria': { source: string | number };
   'common.ui.sectionNotFound': { section: string | number };
   'common.validation.minLength': { min: string | number };
   'common.validation.maxLength': { max: string | number };

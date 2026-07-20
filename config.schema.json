@@ -1028,6 +1028,21 @@
       "type": "object",
       "description": "HomeAssistantSettings contains settings for Home Assistant MQTT auto-discovery."
     },
+    "IdentificationCheckSettings": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to compute and expose the identification-check verdict (default: true)"
+        },
+        "xenocanto": {
+          "$ref": "#/$defs/XenocantoSettings",
+          "description": "Xeno-canto reference-recording (\"trusted example\") source"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "IdentificationCheckSettings controls the identification-check feature, which surfaces a plain-language \"strong / mixed / weak support\" verdict for each detection computed from local signals (confidence, species expectedness, and how often the species was heard)."
+    },
     "ImportConfig": {
       "properties": {
         "allowinappelevation": {
@@ -1873,6 +1888,10 @@
         "extendedcapture": {
           "$ref": "#/$defs/ExtendedCaptureSettings",
           "description": "Extended capture for long calling species"
+        },
+        "identificationcheck": {
+          "$ref": "#/$defs/IdentificationCheckSettings",
+          "description": "Plain-language identification-check verdict settings"
         }
       },
       "additionalProperties": false,
@@ -2772,6 +2791,21 @@
       "additionalProperties": false,
       "type": "object",
       "description": "WundergroundSettings contains settings for WeatherUnderground integration."
+    },
+    "XenocantoSettings": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to fetch reference recordings from Xeno-canto"
+        },
+        "apikey": {
+          "type": "string",
+          "description": "Xeno-canto API v3 key (secret; redacted over the API)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "XenocantoSettings configures the Xeno-canto reference-recording source used to fetch a \"trusted example\" for a species."
     },
     "YearlyTrackingSettings": {
       "properties": {
