@@ -1033,6 +1033,10 @@
         "enabled": {
           "type": "boolean",
           "description": "true to compute and expose the identification-check verdict (default: true)"
+        },
+        "xenocanto": {
+          "$ref": "#/$defs/XenocantoSettings",
+          "description": "Xeno-canto reference-recording (\"trusted example\") source"
         }
       },
       "additionalProperties": false,
@@ -2787,6 +2791,21 @@
       "additionalProperties": false,
       "type": "object",
       "description": "WundergroundSettings contains settings for WeatherUnderground integration."
+    },
+    "XenocantoSettings": {
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "true to fetch reference recordings from Xeno-canto"
+        },
+        "apikey": {
+          "type": "string",
+          "description": "Xeno-canto API v3 key (secret; redacted over the API)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "XenocantoSettings configures the Xeno-canto reference-recording source used to fetch a \"trusted example\" for a species."
     },
     "YearlyTrackingSettings": {
       "properties": {
