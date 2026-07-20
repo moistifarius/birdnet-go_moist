@@ -352,12 +352,23 @@ export interface EBirdSettings {
   locale: string; // locale for eBird data (e.g., "en", "es")
 }
 
+export interface XenocantoSettings {
+  enabled: boolean;
+  apiKey: string;
+}
+
+export interface IdentificationCheckSettings {
+  enabled: boolean;
+  xenocanto: XenocantoSettings;
+}
+
 export interface IntegrationSettings {
   birdweather: BirdWeatherSettings;
   mqtt: MQTTSettings;
   observability: ObservabilitySettings;
   weather: WeatherSettings;
   ebird: EBirdSettings;
+  identificationCheck: IdentificationCheckSettings;
 }
 
 export interface BirdWeatherSettings {
@@ -564,6 +575,7 @@ export interface RealtimeSettings {
   speciesTracking?: SpeciesTrackingSettings;
   extendedCapture?: ExtendedCaptureSettings;
   ebird?: EBirdSettings;
+  identificationCheck?: IdentificationCheckSettings;
 }
 
 // WebServer settings
@@ -992,6 +1004,13 @@ function createEmptySettings(): SettingsFormData {
         cacheTTL: 24,
         locale: 'en',
       },
+      identificationCheck: {
+        enabled: true,
+        xenocanto: {
+          enabled: false,
+          apiKey: '',
+        },
+      },
       species: {
         include: [],
         exclude: [],
@@ -1189,6 +1208,13 @@ export const integrationSettings = derived(settingsStore, $store => ({
     apiKey: '',
     cacheTTL: 24,
     locale: 'en',
+  },
+  identificationCheck: $store.formData.realtime?.identificationCheck ?? {
+    enabled: true,
+    xenocanto: {
+      enabled: false,
+      apiKey: '',
+    },
   },
 }));
 

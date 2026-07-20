@@ -40,7 +40,7 @@
   import type { TabDefinition } from '$lib/desktop/features/settings/components/SettingsTabs.svelte';
   import { t } from '$lib/i18n';
   import SelectDropdown from '$lib/desktop/components/forms/SelectDropdown.svelte';
-  import { Bird, Radio, Activity, Binoculars } from '@lucide/svelte';
+  import { Bird, Radio, Activity, Binoculars, ShieldCheck } from '@lucide/svelte';
   import {
     integrationSettings,
     realtimeSettings,
@@ -126,6 +126,13 @@
         cacheTTL: 24,
         locale: 'en',
       },
+      identificationCheck: {
+        enabled: true,
+        xenocanto: {
+          enabled: false,
+          apiKey: '',
+        },
+      },
     }
   );
 
@@ -161,6 +168,13 @@
     )
   );
 
+  let identificationCheckHasChanges = $derived(
+    hasSettingsChanged(
+      (store.originalData as SettingsFormData)?.realtime?.identificationCheck,
+      (store.formData as SettingsFormData)?.realtime?.identificationCheck
+    )
+  );
+
   // Validate eBird: enabled requires API key
   $effect(() => {
     const EBIRD_ERROR_KEY = 'ebird-api-key-required';
@@ -185,6 +199,29 @@
     return () => {
       // Clear only eBird validation errors when leaving this page
       settingsValidationErrors.update(errors => errors.filter(e => e !== EBIRD_ERROR_KEY));
+    };
+  });
+
+  // Validate Xeno-canto: the online source, when enabled, requires an API key
+  $effect(() => {
+    const XC_ERROR_KEY = 'xenocanto-api-key-required';
+    const xcEnabled = settings.identificationCheck?.xenocanto?.enabled ?? false;
+    const xcApiKey = settings.identificationCheck?.xenocanto?.apiKey?.trim() ?? '';
+    const needsError = xcEnabled && !xcApiKey;
+
+    settingsValidationErrors.update(errors => {
+      const hasError = errors.includes(XC_ERROR_KEY);
+      if (needsError && !hasError) {
+        return [...errors, XC_ERROR_KEY];
+      }
+      if (!needsError && hasError) {
+        return errors.filter(e => e !== XC_ERROR_KEY);
+      }
+      return errors;
+    });
+
+    return () => {
+      settingsValidationErrors.update(errors => errors.filter(e => e !== XC_ERROR_KEY));
     };
   });
 
@@ -308,6 +345,13 @@
       icon: Binoculars,
       content: ebirdTabContent,
       hasChanges: ebirdHasChanges,
+    },
+    {
+      id: 'identificationCheck',
+      label: t('settings.integration.identificationCheck.title'),
+      icon: ShieldCheck,
+      content: identificationCheckTabContent,
+      hasChanges: identificationCheckHasChanges,
     },
     {
       id: 'prometheus',
@@ -501,6 +545,31 @@
   function updateEBirdCacheTTL(cacheTTL: number) {
     settingsActions.updateSection('realtime', {
       ebird: { ...settings.ebird!, cacheTTL },
+    });
+  }
+
+  // Identification-check update handlers
+  function updateIdCheckEnabled(enabled: boolean) {
+    settingsActions.updateSection('realtime', {
+      identificationCheck: { ...settings.identificationCheck!, enabled },
+    });
+  }
+
+  function updateXenocantoEnabled(enabled: boolean) {
+    settingsActions.updateSection('realtime', {
+      identificationCheck: {
+        ...settings.identificationCheck!,
+        xenocanto: { ...settings.identificationCheck!.xenocanto, enabled },
+      },
+    });
+  }
+
+  function updateXenocantoApiKey(apiKey: string) {
+    settingsActions.updateSection('realtime', {
+      identificationCheck: {
+        ...settings.identificationCheck!,
+        xenocanto: { ...settings.identificationCheck!.xenocanto, apiKey },
+      },
     });
   }
 
@@ -1734,6 +1803,79 @@
 
             <SettingsNote>
               <span>{t('settings.integration.ebird.note')}</span>
+            </SettingsNote>
+          </div>
+        </fieldset>
+      </div>
+    </SettingsSection>
+  </div>
+{/snippet}
+
+{#snippet identificationCheckTabContent()}
+  <div class="space-y-6">
+    <SettingsSection
+      title={t('settings.integration.identificationCheck.title')}
+      description={t('settings.integration.identificationCheck.description')}
+      originalData={(store.originalData as SettingsFormData)?.realtime?.identificationCheck}
+      currentData={(store.formData as SettingsFormData)?.realtime?.identificationCheck}
+    >
+      <div class="space-y-4">
+        <Checkbox
+          checked={settings.identificationCheck!.enabled}
+          label={t('settings.integration.identificationCheck.enable')}
+          helpText={t('settings.integration.identificationCheck.enableHelp')}
+          disabled={store.isLoading || store.isSaving}
+          onchange={updateIdCheckEnabled}
+        />
+
+        <Checkbox
+          checked={settings.identificationCheck!.xenocanto.enabled}
+          label={t('settings.integration.identificationCheck.xenocanto.enable')}
+          helpText={t('settings.integration.identificationCheck.xenocanto.enableHelp')}
+          disabled={store.isLoading || store.isSaving}
+          onchange={updateXenocantoEnabled}
+        />
+
+        <!-- Fieldset for accessible disabled state -->
+        <fieldset
+          disabled={!settings.identificationCheck?.xenocanto?.enabled ||
+            store.isLoading ||
+            store.isSaving}
+          class="contents"
+          aria-describedby="xenocanto-status"
+        >
+          <span id="xenocanto-status" class="sr-only">
+            {settings.identificationCheck?.xenocanto?.enabled
+              ? t('settings.integration.identificationCheck.xenocanto.enable')
+              : t('settings.integration.identificationCheck.xenocanto.enabledRequired')}
+          </span>
+          <div
+            class="transition-opacity duration-200"
+            class:opacity-50={!settings.identificationCheck?.xenocanto?.enabled}
+          >
+            <!-- Guided API key info banner -->
+            <ErrorAlert type="info" className="mb-4">
+              {#snippet children()}
+                {@html t('settings.integration.identificationCheck.xenocanto.apiKeyInfo')}
+              {/snippet}
+            </ErrorAlert>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <PasswordField
+                label={t('settings.integration.identificationCheck.xenocanto.apiKey.label')}
+                value={settings.identificationCheck!.xenocanto.apiKey}
+                onUpdate={updateXenocantoApiKey}
+                placeholder=""
+                helpText={t('settings.integration.identificationCheck.xenocanto.apiKey.helpText')}
+                disabled={!settings.identificationCheck?.xenocanto?.enabled ||
+                  store.isLoading ||
+                  store.isSaving}
+                allowReveal={true}
+              />
+            </div>
+
+            <SettingsNote>
+              <span>{t('settings.integration.identificationCheck.xenocanto.note')}</span>
             </SettingsNote>
           </div>
         </fieldset>

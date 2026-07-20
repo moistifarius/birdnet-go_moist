@@ -3341,6 +3341,23 @@
         "configurationCheck": "Kontrola konfigurácie",
         "testStageFallback": "Fáza testu"
       },
+      "identificationCheck": {
+        "title": "Identification checking",
+        "description": "Show a plain-language verdict on whether a detection's identification seems right, and optionally fetch a trusted example recording to compare against.",
+        "enable": "Automatically check new detections",
+        "enableHelp": "Show a plain-language \"strong / mixed / weak support\" verdict on each detection, computed from local signals. Works offline.",
+        "xenocanto": {
+          "enable": "Use trusted online bird sounds (Xeno-canto)",
+          "enableHelp": "Fetch a known-good example recording for the species so you can listen to it beside your detection.",
+          "enabledRequired": "Enable trusted online bird sounds to configure Xeno-canto.",
+          "apiKeyInfo": "A free Xeno-canto account and API key are required. <a href=\"https://xeno-canto.org/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"link\">Create an account</a>, then copy your API key from your account page and paste it below.",
+          "apiKey": {
+            "label": "Xeno-canto API key",
+            "helpText": "Paste the API key from your Xeno-canto account."
+          },
+          "note": "Reference recordings come from the Xeno-canto community under Creative Commons licenses. Fetching happens only when you open a detection, and never affects local detection playback."
+        }
+      },
       "ebird": {
         "title": "eBird",
         "description": "Pripojenie k taxonomickej databáze eBird pre obohatené údaje o druhoch vrátane taxonomickej klasifikácie a informácií o poddruhoch.",
