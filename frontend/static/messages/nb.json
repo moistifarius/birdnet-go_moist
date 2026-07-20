@@ -49,6 +49,15 @@
       "notChecked": "Not checked"
     }
   },
+  "reference": {
+    "title": "Closest trusted example",
+    "loading": "Finding a trusted example…",
+    "tryAnother": "Try another example",
+    "attribution": "Trusted example from {source} · Recorded by {recordist}",
+    "attributionNoRecordist": "Trusted example from {source}",
+    "viewSource": "View source",
+    "audioAria": "Reference recording from {source}"
+  },
   "common": {
     "loading": "Laster...",
     "error": "Feil",

@@ -36,6 +36,13 @@ export type TranslationKey =
   | 'idCheck.details.timesHeard'
   | 'idCheck.details.model'
   | 'idCheck.details.notChecked'
+  | 'reference.title'
+  | 'reference.loading'
+  | 'reference.tryAnother'
+  | 'reference.attribution' // params: source, recordist
+  | 'reference.attributionNoRecordist' // params: source
+  | 'reference.viewSource'
+  | 'reference.audioAria' // params: source
   | 'common.loading'
   | 'common.error'
   | 'common.unknown'
@@ -4012,6 +4019,9 @@ export type TranslationKey =
  * Parameter types for translations that require parameters
  */
 export type TranslationParams = {
+  'reference.attribution': { source: string | number; recordist: string | number };
+  'reference.attributionNoRecordist': { source: string | number };
+  'reference.audioAria': { source: string | number };
   'common.ui.sectionNotFound': { section: string | number };
   'common.validation.minLength': { min: string | number };
   'common.validation.maxLength': { max: string | number };

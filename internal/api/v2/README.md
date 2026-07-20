@@ -139,6 +139,7 @@ Lightweight connectivity check. Returns a minimal response with no database quer
 | GET    | `/detections/recent`          | `GetRecentDetections`   | ❌   | Recent detections                          |
 | GET    | `/detections/:id/time-of-day` | `GetDetectionTimeOfDay` | ❌   | Detection time context                     |
 | GET    | `/detections/:id/id-check`    | `GetDetectionIDCheck`   | ❌   | Plain-language identification-check verdict |
+| GET    | `/detections/:id/reference`   | `GetDetectionReference` | ❌   | Trusted-example reference recordings (Xeno-canto) |
 | DELETE | `/detections/:id`             | `DeleteDetection`       | ✅   | Delete detection record                    |
 | POST   | `/detections/:id/review`      | `ReviewDetection`       | ✅   | Review/verify detection                    |
 | POST   | `/detections/:id/lock`        | `LockDetection`         | ✅   | Lock detection from changes                |

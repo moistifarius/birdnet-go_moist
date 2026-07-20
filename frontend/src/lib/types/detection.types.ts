@@ -71,6 +71,30 @@ export interface IdCheckResult {
   details?: IdCheckDetails;
 }
 
+// Reference recording ("trusted example") — a known-good example for a species
+// from an external catalog (Xeno-canto), served by GET /detections/:id/reference.
+export interface ReferenceRecording {
+  id: string;
+  scientificName?: string;
+  commonName?: string;
+  recordist?: string;
+  country?: string;
+  callType?: string;
+  pageUrl?: string;
+  audioUrl?: string;
+  licenseName?: string;
+  licenseUrl?: string;
+  quality?: string;
+  length?: string;
+  sourceProvider?: string;
+}
+
+export interface ReferenceResult {
+  enabled: boolean;
+  best?: ReferenceRecording;
+  alternatives?: ReferenceRecording[];
+}
+
 export interface PaginatedDetectionResponse {
   data: Detection[];
   total: number;
