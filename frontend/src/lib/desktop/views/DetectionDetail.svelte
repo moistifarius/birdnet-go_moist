@@ -21,6 +21,7 @@
   import VerificationBadges from '$lib/desktop/components/ui/VerificationBadges.svelte';
   import IdCheckPanel from '$lib/desktop/components/ui/IdCheckPanel.svelte';
   import TrustedExample from '$lib/desktop/components/media/TrustedExample.svelte';
+  import CompareSounds from '$lib/desktop/components/media/CompareSounds.svelte';
   import ErrorAlert from '$lib/desktop/components/ui/ErrorAlert.svelte';
   import { handleBirdImageError } from '$lib/desktop/components/ui/image-utils.js';
   import { t } from '$lib/i18n';
@@ -108,6 +109,7 @@
   let canReview = $derived($hasReviewPermission);
   let clipExtractionEnabled = $derived($isAuthenticated);
   let detection = $state<Detection | null>(null);
+  let compareOpen = $state(false);
   let speciesInfo = $state<SpeciesInfo | null>(null);
   let taxonomyInfo = $state<TaxonomyInfo | null>(null);
   let isLoadingDetection = $state(true);
@@ -893,7 +895,21 @@
     <IdCheckPanel detectionId={detection.id} className="surface-card p-5 md:p-6" />
 
     <!-- Trusted example reference recording (renders nothing when disabled or unavailable) -->
-    <TrustedExample detectionId={detection.id} className="surface-card p-5 md:p-6" />
+    <TrustedExample
+      detectionId={detection.id}
+      className="surface-card p-5 md:p-6"
+      onCompare={() => (compareOpen = true)}
+    />
+
+    <!-- Compare sounds modal -->
+    <CompareSounds
+      {detection}
+      isOpen={compareOpen}
+      onClose={() => (compareOpen = false)}
+      onReviewed={verdict => {
+        if (detection) detection.verified = verdict;
+      }}
+    />
 
     <!-- Tabbed Content -->
     <section class="surface-card" aria-labelledby="tabs-heading">

@@ -272,6 +272,26 @@ type xcRecording struct {
 	Length   string   `json:"length"`
 	Also     []string `json:"also"`
 	Date     string   `json:"date"`
+	Sono     xcSono   `json:"sono"`
+}
+
+// xcSono holds Xeno-canto's pre-rendered sonogram ("sound picture") images at
+// several sizes.
+type xcSono struct {
+	Small string `json:"small"`
+	Med   string `json:"med"`
+	Large string `json:"large"`
+	Full  string `json:"full"`
+}
+
+// bestSonogram picks the most detailed available sonogram image.
+func bestSonogram(s xcSono) string {
+	for _, u := range []string{s.Large, s.Med, s.Full, s.Small} {
+		if u != "" {
+			return normalizeProviderURL(u)
+		}
+	}
+	return ""
 }
 
 // toRecording maps a raw Xeno-canto recording to the provider-neutral Recording.
@@ -288,6 +308,7 @@ func toRecording(x *xcRecording) Recording {
 		CallType:       x.Type,
 		PageURL:        normalizeProviderURL(x.URL),
 		AudioURL:       normalizeProviderURL(x.File),
+		SonogramURL:    bestSonogram(x.Sono),
 		FileName:       x.FileName,
 		LicenseName:    licenseName,
 		LicenseURL:     licenseURL,

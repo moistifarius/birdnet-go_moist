@@ -56,9 +56,10 @@ type Recording struct {
 	Recordist      string   `json:"recordist,omitempty"` // author, for attribution
 	Country        string   `json:"country,omitempty"`
 	Location       string   `json:"location,omitempty"`
-	CallType       string   `json:"callType,omitempty"` // vocalization type as labelled by the recordist
-	PageURL        string   `json:"pageUrl,omitempty"`  // human-facing source page
-	AudioURL       string   `json:"audioUrl,omitempty"` // downloadable audio
+	CallType       string   `json:"callType,omitempty"`    // vocalization type as labelled by the recordist
+	PageURL        string   `json:"pageUrl,omitempty"`     // human-facing source page
+	AudioURL       string   `json:"audioUrl,omitempty"`    // downloadable audio
+	SonogramURL    string   `json:"sonogramUrl,omitempty"` // pre-rendered sonogram ("sound picture") image
 	FileName       string   `json:"fileName,omitempty"`
 	LicenseName    string   `json:"licenseName,omitempty"`
 	LicenseURL     string   `json:"licenseUrl,omitempty"`

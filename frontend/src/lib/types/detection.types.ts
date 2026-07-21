@@ -82,6 +82,7 @@ export interface ReferenceRecording {
   callType?: string;
   pageUrl?: string;
   audioUrl?: string;
+  sonogramUrl?: string;
   licenseName?: string;
   licenseUrl?: string;
   quality?: string;

@@ -15,14 +15,16 @@
   import { fetchReference, referenceSourceLabel } from '$lib/utils/referenceRecording';
   import { t } from '$lib/i18n';
   import { cn } from '$lib/utils/cn';
-  import { RefreshCw, ExternalLink } from '@lucide/svelte';
+  import { RefreshCw, ExternalLink, GitCompareArrows } from '@lucide/svelte';
 
   interface Props {
     detectionId: number;
     className?: string;
+    /** When provided, shows a "Compare sounds" button that invokes this. */
+    onCompare?: () => void;
   }
 
-  let { detectionId, className = '' }: Props = $props();
+  let { detectionId, className = '', onCompare }: Props = $props();
 
   let result = $state<ReferenceResult | null>(null);
   let loading = $state(true);
@@ -115,11 +117,19 @@
       {/if}
     </div>
 
-    {#if hasMultiple}
-      <button type="button" class="btn btn-sm btn-ghost mt-2 gap-1" onclick={tryAnother}>
-        <RefreshCw class="size-4" />
-        {t('reference.tryAnother')}
-      </button>
-    {/if}
+    <div class="mt-2 flex flex-wrap gap-2">
+      {#if hasMultiple}
+        <button type="button" class="btn btn-sm btn-ghost gap-1" onclick={tryAnother}>
+          <RefreshCw class="size-4" />
+          {t('reference.tryAnother')}
+        </button>
+      {/if}
+      {#if onCompare}
+        <button type="button" class="btn btn-sm btn-primary gap-1" onclick={onCompare}>
+          <GitCompareArrows class="size-4" />
+          {t('reference.compare.title')}
+        </button>
+      {/if}
+    </div>
   </section>
 {/if}

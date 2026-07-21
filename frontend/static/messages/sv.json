@@ -56,7 +56,29 @@
     "attribution": "Trusted example from {source} · Recorded by {recordist}",
     "attributionNoRecordist": "Trusted example from {source}",
     "viewSource": "View source",
-    "audioAria": "Reference recording from {source}"
+    "audioAria": "Reference recording from {source}",
+    "compare": {
+      "title": "Compare sounds",
+      "auto": "Compare automatically",
+      "stop": "Stop",
+      "play": "Play",
+      "yourRecording": "Your recording",
+      "noExample": "No trusted example is available for this species yet.",
+      "noSoundPicture": "No sound picture available",
+      "keep": "Yes, keep this ID",
+      "notSure": "Not sure",
+      "wrong": "No, this seems wrong",
+      "notSureNote": "That's okay — the detection stays unreviewed. You can always come back to it.",
+      "done": "Done",
+      "back": "Back",
+      "wrongReason": {
+        "title": "What seems wrong?",
+        "anotherBird": "It sounds like another bird",
+        "onlyNoise": "I only hear noise",
+        "overlap": "Several birds overlap",
+        "unclear": "The recording is too unclear"
+      }
+    }
   },
   "common": {
     "loading": "Laddar...",

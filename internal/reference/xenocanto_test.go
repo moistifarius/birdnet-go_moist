@@ -42,7 +42,8 @@ const sampleResponse = `{
       "loc": "Central Park", "type": "song", "url": "//xeno-canto.org/111",
       "file": "//xeno-canto.org/111/download", "file-name": "XC111.mp3",
       "lic": "//creativecommons.org/licenses/by-nc-sa/4.0/", "q": "A",
-      "length": "0:12", "also": ["Passer domesticus"], "date": "2025-07-01"
+      "length": "0:12", "also": ["Passer domesticus"], "date": "2025-07-01",
+      "sono": {"small": "//xeno-canto.org/sono/small.png", "med": "//xeno-canto.org/sono/med.png", "large": "//xeno-canto.org/sono/large.png", "full": "//xeno-canto.org/sono/full.png"}
     }
   ]
 }`
@@ -73,6 +74,7 @@ func TestSearch_ParsesAndMapsResponse(t *testing.T) {
 	assert.Equal(t, "song", r.CallType)
 	assert.Equal(t, "https://xeno-canto.org/111", r.PageURL)
 	assert.Equal(t, "https://xeno-canto.org/111/download", r.AudioURL)
+	assert.Equal(t, "https://xeno-canto.org/sono/large.png", r.SonogramURL) // prefers the largest available
 	assert.Equal(t, "CC BY-NC-SA 4.0", r.LicenseName)
 	assert.Equal(t, "https://creativecommons.org/licenses/by-nc-sa/4.0/", r.LicenseURL)
 	assert.Equal(t, "A", r.Quality)

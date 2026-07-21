@@ -40,6 +40,7 @@ type ReferenceRecording struct {
 	CallType       string `json:"callType,omitempty"`
 	PageURL        string `json:"pageUrl,omitempty"`
 	AudioURL       string `json:"audioUrl,omitempty"`
+	SonogramURL    string `json:"sonogramUrl,omitempty"`
 	LicenseName    string `json:"licenseName,omitempty"`
 	LicenseURL     string `json:"licenseUrl,omitempty"`
 	Quality        string `json:"quality,omitempty"`
@@ -144,6 +145,7 @@ func toReferenceRecording(r *reference.Recording) ReferenceRecording {
 		CallType:       r.CallType,
 		PageURL:        r.PageURL,
 		AudioURL:       r.AudioURL,
+		SonogramURL:    r.SonogramURL,
 		LicenseName:    r.LicenseName,
 		LicenseURL:     r.LicenseURL,
 		Quality:        r.Quality,
