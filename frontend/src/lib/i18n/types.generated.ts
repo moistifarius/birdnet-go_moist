@@ -67,6 +67,16 @@ export type TranslationKey =
   | 'reference.compare.wrongReason.onlyNoise'
   | 'reference.compare.wrongReason.overlap'
   | 'reference.compare.wrongReason.unclear'
+  | 'reviewQueue.title'
+  | 'reviewQueue.banner' // params: count
+  | 'reviewQueue.bannerOne'
+  | 'reviewQueue.review'
+  | 'reviewQueue.progress' // params: current, total
+  | 'reviewQueue.allDone'
+  | 'reviewQueue.done'
+  | 'reviewQueue.wrong'
+  | 'reviewQueue.notSure'
+  | 'reviewQueue.correct'
   | 'common.loading'
   | 'common.error'
   | 'common.unknown'
@@ -4058,6 +4068,8 @@ export type TranslationParams = {
   'reference.attributionNoRecordist': { source: string | number };
   'reference.audioAria': { source: string | number };
   'reference.compare.backToDetected': { species: string | number };
+  'reviewQueue.banner': { count: string | number };
+  'reviewQueue.progress': { current: string | number; total: string | number };
   'common.ui.sectionNotFound': { section: string | number };
   'common.validation.minLength': { min: string | number };
   'common.validation.maxLength': { max: string | number };

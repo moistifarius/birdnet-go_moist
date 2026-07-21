@@ -8,6 +8,7 @@
     DetectionSortBy,
   } from '$lib/types/detection.types';
   import DetectionsCard from './components/DetectionsCard.svelte';
+  import ReviewQueue from './components/ReviewQueue.svelte';
   import { getLogger } from '$lib/utils/logger';
   import { getLocalDateString } from '$lib/utils/date';
   import { navigation } from '$lib/stores/navigation.svelte';
@@ -272,6 +273,7 @@
 </script>
 
 <div class="col-span-12 space-y-6">
+  <ReviewQueue onReviewed={fetchDetections} />
   <DetectionsCard
     data={detectionsData}
     {loading}
