@@ -96,6 +96,18 @@ export interface ReferenceResult {
   alternatives?: ReferenceRecording[];
 }
 
+export interface AlternativeSpecies {
+  scientificName: string;
+  commonName?: string;
+  confidence?: number;
+  example?: ReferenceRecording;
+}
+
+export interface AlternativesResult {
+  enabled: boolean;
+  alternatives?: AlternativeSpecies[];
+}
+
 export interface PaginatedDetectionResponse {
   data: Detection[];
   total: number;

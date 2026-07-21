@@ -8,7 +8,7 @@
  * disturb the rest of the detection UI.
  */
 import { api } from './api';
-import type { ReferenceResult } from '$lib/types/detection.types';
+import type { AlternativesResult, ReferenceResult } from '$lib/types/detection.types';
 import { loggers } from './logger';
 
 const logger = loggers.ui;
@@ -53,6 +53,37 @@ export async function fetchReference(id: number): Promise<ReferenceResult | null
 export function clearReferenceCache(): void {
   cache.clear();
   inFlight.clear();
+}
+
+const altCache = new Map<number, AlternativesResult>();
+const altInFlight = new Map<number, Promise<AlternativesResult | null>>();
+
+/**
+ * Fetches the plausible alternative species for a detection (with trusted
+ * examples when available), cached per detection. Resolves to `null` on error.
+ */
+export async function fetchAlternatives(id: number): Promise<AlternativesResult | null> {
+  const cached = altCache.get(id);
+  if (cached !== undefined) return cached;
+
+  const existing = altInFlight.get(id);
+  if (existing !== undefined) return existing;
+
+  const request = (async (): Promise<AlternativesResult | null> => {
+    try {
+      const result = await api.get<AlternativesResult>(`/api/v2/detections/${id}/alternatives`);
+      altCache.set(id, result);
+      return result;
+    } catch (error) {
+      logger.error('Failed to fetch alternative species', error, { detectionId: id });
+      return null;
+    } finally {
+      altInFlight.delete(id);
+    }
+  })();
+
+  altInFlight.set(id, request);
+  return request;
 }
 
 /** Maps a source-provider id to a human-facing label. */

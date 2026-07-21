@@ -157,6 +157,7 @@ func (c *Handler) RegisterDetectionRoutes(g *echo.Group) {
 	g.GET("/detections/:id/time-of-day", c.GetDetectionTimeOfDay)
 	g.GET("/detections/:id/id-check", c.GetDetectionIDCheck)
 	g.GET("/detections/:id/reference", c.GetDetectionReference)
+	g.GET("/detections/:id/alternatives", c.GetDetectionAlternatives)
 
 	// Protected detection management endpoints
 	detectionGroup := g.Group("/detections", c.AuthMiddleware)

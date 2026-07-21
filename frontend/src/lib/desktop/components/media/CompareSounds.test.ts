@@ -4,11 +4,16 @@ import CompareSounds from './CompareSounds.svelte';
 import type { Detection } from '$lib/types/detection.types';
 
 const fetchReferenceMock = vi.fn();
+const fetchAlternativesMock = vi.fn();
 const setVerificationMock = vi.fn().mockResolvedValue(true);
 
 vi.mock('$lib/utils/referenceRecording', async importOriginal => {
   const actual = await importOriginal<typeof import('$lib/utils/referenceRecording')>();
-  return { ...actual, fetchReference: (...args: unknown[]) => fetchReferenceMock(...args) };
+  return {
+    ...actual,
+    fetchReference: (...args: unknown[]) => fetchReferenceMock(...args),
+    fetchAlternatives: (...args: unknown[]) => fetchAlternativesMock(...args),
+  };
 });
 
 vi.mock('$lib/utils/reviewDetection', () => ({
@@ -74,6 +79,7 @@ describe('CompareSounds', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setVerificationMock.mockResolvedValue(true);
+    fetchAlternativesMock.mockResolvedValue({ enabled: true, alternatives: [] });
   });
 
   it('shows the two sound pictures and keeps the ID on "correct"', async () => {
@@ -107,12 +113,49 @@ describe('CompareSounds', () => {
     await waitFor(() =>
       expect(screen.getByText('reference.compare.wrongReason.title')).toBeInTheDocument()
     );
-    await fireEvent.click(screen.getByText('reference.compare.wrongReason.anotherBird'));
+    // "I only hear noise" marks the detection as a false positive.
+    await fireEvent.click(screen.getByText('reference.compare.wrongReason.onlyNoise'));
     await waitFor(() => expect(setVerificationMock).toHaveBeenCalledWith(42, 'false_positive'));
   });
 
-  it('accepts "Not sure" without persisting anything', async () => {
+  it('routes "It sounds like another bird" to the alternatives', async () => {
     fetchReferenceMock.mockResolvedValue(referenceResult);
+    fetchAlternativesMock.mockResolvedValue({
+      enabled: true,
+      alternatives: [{ scientificName: 'Spizella passerina', commonName: 'Chipping Sparrow' }],
+    });
+    render(CompareSounds, {
+      props: { detection: detection(), isOpen: true, onClose: vi.fn() },
+    });
+
+    await waitFor(() => expect(screen.getByText('reference.compare.wrong')).toBeInTheDocument());
+    await fireEvent.click(screen.getByText('reference.compare.wrong'));
+    await waitFor(() =>
+      expect(screen.getByText('reference.compare.wrongReason.anotherBird')).toBeInTheDocument()
+    );
+    await fireEvent.click(screen.getByText('reference.compare.wrongReason.anotherBird'));
+    await waitFor(() =>
+      expect(screen.getByText('reference.compare.alternativesTitle')).toBeInTheDocument()
+    );
+    expect(setVerificationMock).not.toHaveBeenCalled();
+  });
+
+  it('offers alternatives on "Not sure", then reassures on "Still not sure"', async () => {
+    fetchReferenceMock.mockResolvedValue(referenceResult);
+    fetchAlternativesMock.mockResolvedValue({
+      enabled: true,
+      alternatives: [
+        {
+          scientificName: 'Spizella passerina',
+          commonName: 'Chipping Sparrow',
+          example: {
+            id: '9',
+            audioUrl: 'https://example.test/9.mp3',
+            sourceProvider: 'xeno-canto',
+          },
+        },
+      ],
+    });
     render(CompareSounds, {
       props: { detection: detection(), isOpen: true, onClose: vi.fn() },
     });
@@ -120,10 +163,46 @@ describe('CompareSounds', () => {
     await waitFor(() => expect(screen.getByText('reference.compare.notSure')).toBeInTheDocument());
     await fireEvent.click(screen.getByText('reference.compare.notSure'));
 
+    await waitFor(() => expect(screen.getByText('Chipping Sparrow')).toBeInTheDocument());
+    expect(screen.getByText('reference.compare.alternativesTitle')).toBeInTheDocument();
+
+    await fireEvent.click(screen.getByText('reference.compare.stillNotSure'));
     await waitFor(() =>
       expect(screen.getByText('reference.compare.notSureNote')).toBeInTheDocument()
     );
     expect(setVerificationMock).not.toHaveBeenCalled();
+  });
+
+  it('switches the compared example when an alternative is chosen', async () => {
+    fetchReferenceMock.mockResolvedValue(referenceResult);
+    fetchAlternativesMock.mockResolvedValue({
+      enabled: true,
+      alternatives: [
+        {
+          scientificName: 'Spizella passerina',
+          commonName: 'Chipping Sparrow',
+          example: {
+            id: '9',
+            audioUrl: 'https://example.test/9.mp3',
+            sonogramUrl: 'https://example.test/9.png',
+            sourceProvider: 'xeno-canto',
+          },
+        },
+      ],
+    });
+    render(CompareSounds, {
+      props: { detection: detection(), isOpen: true, onClose: vi.fn() },
+    });
+
+    await waitFor(() => expect(screen.getByText('reference.compare.notSure')).toBeInTheDocument());
+    await fireEvent.click(screen.getByText('reference.compare.notSure'));
+    await waitFor(() => expect(screen.getByText('Chipping Sparrow')).toBeInTheDocument());
+    await fireEvent.click(screen.getByText('reference.compare.compareWith'));
+
+    // Back on the compare view, now labelled with the alternative species.
+    await waitFor(() =>
+      expect(screen.getByText('reference.compare.backToDetected')).toBeInTheDocument()
+    );
   });
 
   it('shows a friendly message when no example exists', async () => {

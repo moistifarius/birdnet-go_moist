@@ -71,6 +71,12 @@
       "notSureNote": "That's okay — the detection stays unreviewed. You can always come back to it.",
       "done": "Done",
       "back": "Back",
+      "alternativesTitle": "Not sure? Compare the closest possibilities:",
+      "compareWith": "Compare",
+      "stillNotSure": "Still not sure",
+      "backToDetected": "Back to {species}",
+      "noAlternatives": "No alternatives to suggest for this detection.",
+      "noExampleForAlt": "No example",
       "wrongReason": {
         "title": "What seems wrong?",
         "anotherBird": "It sounds like another bird",

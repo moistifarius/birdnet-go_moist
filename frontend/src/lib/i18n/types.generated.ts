@@ -56,6 +56,12 @@ export type TranslationKey =
   | 'reference.compare.notSureNote'
   | 'reference.compare.done'
   | 'reference.compare.back'
+  | 'reference.compare.alternativesTitle'
+  | 'reference.compare.compareWith'
+  | 'reference.compare.stillNotSure'
+  | 'reference.compare.backToDetected' // params: species
+  | 'reference.compare.noAlternatives'
+  | 'reference.compare.noExampleForAlt'
   | 'reference.compare.wrongReason.title'
   | 'reference.compare.wrongReason.anotherBird'
   | 'reference.compare.wrongReason.onlyNoise'
@@ -4051,6 +4057,7 @@ export type TranslationParams = {
   'reference.attribution': { source: string | number; recordist: string | number };
   'reference.attributionNoRecordist': { source: string | number };
   'reference.audioAria': { source: string | number };
+  'reference.compare.backToDetected': { species: string | number };
   'common.ui.sectionNotFound': { section: string | number };
   'common.validation.minLength': { min: string | number };
   'common.validation.maxLength': { max: string | number };

@@ -5,20 +5,30 @@
   "Trusted example"), plays them back-to-back on one tap, and asks the one simple
   question — does the identification seem right? Correct / Not sure / Wrong.
 
-  It reuses existing endpoints: the local clip + spectrogram, and the reference
-  recording's audio + Xeno-canto sonogram image. Decisions go through the same
-  review wrapper as the rest of the app.
+  When the user is unsure (or thinks it's another bird) it offers the closest
+  alternative species and lets them A/B the local recording against each one.
+
+  It reuses existing endpoints and degrades quietly; decisions go through the
+  same review wrapper as the rest of the app.
 -->
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import type { Detection, ReferenceRecording } from '$lib/types/detection.types';
+  import type {
+    AlternativeSpecies,
+    Detection,
+    ReferenceRecording,
+  } from '$lib/types/detection.types';
   import Modal from '$lib/desktop/components/ui/Modal.svelte';
-  import { fetchReference, referenceSourceLabel } from '$lib/utils/referenceRecording';
+  import {
+    fetchReference,
+    fetchAlternatives,
+    referenceSourceLabel,
+  } from '$lib/utils/referenceRecording';
   import { setDetectionVerification } from '$lib/utils/reviewDetection';
   import { createSpectrogramLoader } from '$lib/utils/spectrogramLoader.svelte';
   import { buildAppUrl } from '$lib/utils/urlHelpers';
   import { t } from '$lib/i18n';
-  import { Play, Square, Check, CircleHelp, X } from '@lucide/svelte';
+  import { Play, Square, Check, CircleHelp, X, ArrowLeft } from '@lucide/svelte';
 
   interface Props {
     detection: Detection;
@@ -29,13 +39,21 @@
 
   let { detection, isOpen, onClose, onReviewed }: Props = $props();
 
-  type Step = 'compare' | 'wrongReason' | 'notSure';
+  type Step = 'compare' | 'alternatives' | 'wrongReason' | 'notSure';
   type Which = 'local' | 'example';
 
   let step = $state<Step>('compare');
   let reference = $state<ReferenceRecording | null>(null);
   let loadingRef = $state(true);
   let deciding = $state(false);
+
+  // The example currently shown on the right — the detected species by default,
+  // or an alternative species the user chose to compare against.
+  let activeExample = $state<ReferenceRecording | null>(null);
+  let comparingAltName = $state<string | null>(null);
+
+  let alternatives = $state<AlternativeSpecies[]>([]);
+  let loadingAlts = $state(false);
 
   const loader = createSpectrogramLoader({ size: 'md', raw: true });
 
@@ -45,8 +63,9 @@
   let playingWhich = $state<Which | null>(null);
 
   let localAudioUrl = $derived(buildAppUrl(`/api/v2/audio/${detection.id}`));
-  let source = $derived(referenceSourceLabel(reference?.sourceProvider));
-  let canCompare = $derived(!!reference?.audioUrl);
+  let source = $derived(referenceSourceLabel(activeExample?.sourceProvider));
+  let canCompare = $derived(!!activeExample?.audioUrl);
+  let exampleLabel = $derived(comparingAltName ?? t('reference.title'));
 
   // Back-to-back sequence: your recording, the example, then once more.
   const SEQUENCE: Which[] = ['local', 'example', 'local', 'example'];
@@ -57,11 +76,15 @@
     step = 'compare';
     loadingRef = true;
     reference = null;
+    activeExample = null;
+    comparingAltName = null;
+    alternatives = [];
     loader.start(detection.id);
     let cancelled = false;
     void fetchReference(detection.id).then(r => {
       if (!cancelled) {
         reference = r?.enabled ? (r.best ?? null) : null;
+        activeExample = reference;
         loadingRef = false;
       }
     });
@@ -159,6 +182,31 @@
     }
   }
 
+  function showAlternatives() {
+    stopPlayback();
+    step = 'alternatives';
+    if (alternatives.length > 0 || loadingAlts) return;
+    loadingAlts = true;
+    void fetchAlternatives(detection.id).then(r => {
+      alternatives = r?.enabled ? (r.alternatives ?? []) : [];
+      loadingAlts = false;
+    });
+  }
+
+  function chooseAlternative(alt: AlternativeSpecies) {
+    stopPlayback();
+    activeExample = alt.example ?? null;
+    comparingAltName = alt.commonName ?? alt.scientificName;
+    step = 'compare';
+  }
+
+  function backToDetected() {
+    stopPlayback();
+    activeExample = reference;
+    comparingAltName = null;
+    step = 'compare';
+  }
+
   function handleClose() {
     stopPlayback();
     onClose();
@@ -178,6 +226,13 @@
       {:else if !reference}
         <p class="text-sm text-base-content/70">{t('reference.compare.noExample')}</p>
       {:else if step === 'compare'}
+        {#if comparingAltName}
+          <button type="button" class="btn btn-ghost btn-xs gap-1" onclick={backToDetected}>
+            <ArrowLeft class="size-3" />
+            {t('reference.compare.backToDetected', { species: detection.commonName })}
+          </button>
+        {/if}
+
         <!-- Auto-compare -->
         <button
           type="button"
@@ -219,14 +274,10 @@
           </div>
 
           <div class="sound-picture" class:ring-2={playingWhich === 'example'}>
-            <span class="sound-picture-label">{t('reference.title')}</span>
+            <span class="sound-picture-label">{exampleLabel}</span>
             <div class="sound-picture-frame">
-              {#if reference.sonogramUrl}
-                <img
-                  src={reference.sonogramUrl}
-                  alt={t('reference.title')}
-                  class="sound-picture-img"
-                />
+              {#if activeExample?.sonogramUrl}
+                <img src={activeExample.sonogramUrl} alt={exampleLabel} class="sound-picture-img" />
               {:else}
                 <span class="text-xs text-base-content/50"
                   >{t('reference.compare.noSoundPicture')}</span
@@ -236,6 +287,7 @@
             <button
               type="button"
               class="btn btn-ghost btn-xs gap-1"
+              disabled={!canCompare}
               onclick={() => playOne('example')}
             >
               <Play class="size-3" />{t('reference.compare.play')}
@@ -243,9 +295,11 @@
           </div>
         </div>
 
-        <p class="text-xs text-base-content/60">
-          {t('reference.attribution', { source, recordist: reference.recordist ?? '' })}
-        </p>
+        {#if activeExample}
+          <p class="text-xs text-base-content/60">
+            {t('reference.attribution', { source, recordist: activeExample.recordist ?? '' })}
+          </p>
+        {/if}
 
         <!-- The one decision -->
         <div class="flex flex-wrap gap-2 pt-2">
@@ -261,7 +315,7 @@
             type="button"
             class="btn btn-ghost btn-sm gap-1"
             disabled={deciding}
-            onclick={() => (step = 'notSure')}
+            onclick={showAlternatives}
           >
             <CircleHelp class="size-4" />{t('reference.compare.notSure')}
           </button>
@@ -274,10 +328,50 @@
             <X class="size-4" />{t('reference.compare.wrong')}
           </button>
         </div>
+      {:else if step === 'alternatives'}
+        <p class="text-sm font-medium">{t('reference.compare.alternativesTitle')}</p>
+        {#if loadingAlts}
+          <div class="flex items-center gap-2 text-sm text-base-content/60" role="status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>{t('reference.loading')}</span>
+          </div>
+        {:else}
+          <div class="flex flex-col gap-2">
+            {#each alternatives as alt (alt.scientificName)}
+              <div class="alt-row">
+                <span>{alt.commonName || alt.scientificName}</span>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs"
+                  disabled={!alt.example?.audioUrl}
+                  onclick={() => chooseAlternative(alt)}
+                >
+                  {alt.example?.audioUrl
+                    ? t('reference.compare.compareWith')
+                    : t('reference.compare.noExampleForAlt')}
+                </button>
+              </div>
+            {/each}
+            {#if alternatives.length === 0}
+              <p class="text-sm text-base-content/70">{t('reference.compare.noAlternatives')}</p>
+            {/if}
+          </div>
+        {/if}
+        <button type="button" class="btn btn-ghost btn-xs mt-1" onclick={() => (step = 'notSure')}
+          >{t('reference.compare.stillNotSure')}</button
+        >
       {:else if step === 'wrongReason'}
         <p class="text-sm font-medium">{t('reference.compare.wrongReason.title')}</p>
         <div class="flex flex-col gap-2">
-          {#each ['anotherBird', 'onlyNoise', 'overlap', 'unclear'] as reason (reason)}
+          <button
+            type="button"
+            class="btn btn-outline btn-sm justify-start"
+            disabled={deciding}
+            onclick={showAlternatives}
+          >
+            {t('reference.compare.wrongReason.anotherBird')}
+          </button>
+          {#each ['onlyNoise', 'overlap', 'unclear'] as reason (reason)}
             <button
               type="button"
               class="btn btn-outline btn-sm justify-start"
@@ -300,8 +394,8 @@
 
       <!-- Hidden audio elements drive playback -->
       <audio bind:this={localAudio} src={localAudioUrl} preload="none" class="hidden"></audio>
-      {#if reference?.audioUrl}
-        <audio bind:this={exampleAudio} src={reference.audioUrl} preload="none" class="hidden"
+      {#if activeExample?.audioUrl}
+        <audio bind:this={exampleAudio} src={activeExample.audioUrl} preload="none" class="hidden"
         ></audio>
       {/if}
     </div>
@@ -340,5 +434,16 @@
     width: 100%;
     height: auto;
     image-rendering: pixelated;
+  }
+
+  .alt-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: 0.375rem;
+    background-color: var(--color-base-200);
+    font-size: 0.875rem;
   }
 </style>
