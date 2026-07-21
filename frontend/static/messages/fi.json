@@ -3395,6 +3395,11 @@
             "label": "Xeno-canto API key",
             "helpText": "Paste the API key from your Xeno-canto account."
           },
+          "test": {
+            "button": "Test connection",
+            "loading": "Testing…",
+            "error": "Could not reach Xeno-canto."
+          },
           "note": "Reference recordings come from the Xeno-canto community under Creative Commons licenses. Fetching happens only when you open a detection, and never affects local detection playback."
         }
       },

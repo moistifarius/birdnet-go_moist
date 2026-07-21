@@ -573,6 +573,39 @@
     });
   }
 
+  // Non-streaming Xeno-canto connection test.
+  let xcTest = $state<{ loading: boolean; ok: boolean | null; message: string }>({
+    loading: false,
+    ok: null,
+    message: '',
+  });
+
+  async function testXenocanto() {
+    const xc =
+      store.formData?.realtime?.identificationCheck?.xenocanto ??
+      settings.identificationCheck!.xenocanto;
+    xcTest = { loading: true, ok: null, message: '' };
+    try {
+      const headers = new Headers({ 'Content-Type': 'application/json' });
+      const token = getCsrfToken();
+      if (token) headers.set('X-CSRF-Token', token);
+      const response = await fetch(buildAppUrl('/api/v2/integrations/xenocanto/test'), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ enabled: xc.enabled ?? false, apiKey: xc.apiKey ?? '' }),
+      });
+      const data = (await response.json()) as { success?: boolean; message?: string };
+      xcTest = { loading: false, ok: !!data.success, message: data.message ?? '' };
+    } catch (error) {
+      logger.error('Xeno-canto test failed', error);
+      xcTest = {
+        loading: false,
+        ok: false,
+        message: t('settings.integration.identificationCheck.xenocanto.test.error'),
+      };
+    }
+  }
+
   // eBird locale options
   const ebirdLocaleOptions = [
     { value: 'en', label: 'English' },
@@ -1872,6 +1905,27 @@
                   store.isSaving}
                 allowReveal={true}
               />
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+              <SettingsButton
+                onclick={testXenocanto}
+                loading={xcTest.loading}
+                loadingText={t('settings.integration.identificationCheck.xenocanto.test.loading')}
+                disabled={!settings.identificationCheck?.xenocanto?.enabled ||
+                  !settings.identificationCheck?.xenocanto?.apiKey ||
+                  xcTest.loading}
+              >
+                {t('settings.integration.identificationCheck.xenocanto.test.button')}
+              </SettingsButton>
+              {#if xcTest.ok !== null}
+                <span
+                  class="text-sm"
+                  style={`color: var(${xcTest.ok ? '--color-success' : '--color-error'});`}
+                >
+                  {xcTest.message}
+                </span>
+              {/if}
             </div>
 
             <SettingsNote>

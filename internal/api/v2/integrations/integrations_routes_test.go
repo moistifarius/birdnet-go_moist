@@ -30,5 +30,6 @@ func TestRegisterRoutesRegistration(t *testing.T) {
 		"POST /api/v2/integrations/birdweather/test",
 		"POST /api/v2/integrations/weather/test",
 		"POST /api/v2/integrations/ebird/test",
+		"POST /api/v2/integrations/xenocanto/test",
 	})
 }

@@ -29,6 +29,7 @@ import (
 	"github.com/tphakala/birdnet-go/internal/mqtt"
 	"github.com/tphakala/birdnet-go/internal/notification"
 	"github.com/tphakala/birdnet-go/internal/privacy"
+	"github.com/tphakala/birdnet-go/internal/reference"
 	"github.com/tphakala/birdnet-go/internal/weather"
 )
 
@@ -65,6 +66,10 @@ type Handler struct {
 	getSettingsOrFallback  func() *conf.Settings
 	publishAndSaveSettings func(current, updated *conf.Settings) error
 	handleSettingsChanges  func(oldSettings, currentSettings *conf.Settings) error
+
+	// xenocantoDoer overrides the HTTP transport used by the Xeno-canto
+	// connection test (tests inject a fake; nil uses a real client).
+	xenocantoDoer reference.Doer
 }
 
 // New builds an integrations Handler around the shared core and the facade's
@@ -121,6 +126,9 @@ func (c *Handler) RegisterRoutes(g *echo.Group) {
 	// eBird routes
 	ebirdGroup := integrationsGroup.Group("/ebird")
 	ebirdGroup.POST("/test", c.TestEBirdConnection)
+
+	xenocantoGroup := integrationsGroup.Group("/xenocanto")
+	xenocantoGroup.POST("/test", c.TestXenocantoConnection)
 
 	c.LogInfoIfEnabled("Integrations routes initialized successfully")
 }
