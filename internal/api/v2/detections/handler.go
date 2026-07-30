@@ -79,6 +79,14 @@ type Handler struct {
 	refClient     *reference.Client
 	refKey        string
 	referenceDoer reference.Doer
+
+	// Processed trusted-example clips: a bounded in-memory cache of cropped,
+	// loudness-normalized example audio (see reference_clip.go). refClipDoer
+	// overrides the outbound audio download in tests; refClipOnce guards lazy
+	// cache init.
+	refClipOnce  sync.Once
+	refClipCache *referenceClipCache
+	refClipDoer  reference.Doer
 }
 
 // New constructs the detections domain handler around the shared core and the
@@ -157,6 +165,7 @@ func (c *Handler) RegisterDetectionRoutes(g *echo.Group) {
 	g.GET("/detections/:id/time-of-day", c.GetDetectionTimeOfDay)
 	g.GET("/detections/:id/id-check", c.GetDetectionIDCheck)
 	g.GET("/detections/:id/reference", c.GetDetectionReference)
+	g.GET("/detections/:id/reference/clip", c.GetDetectionReferenceClip)
 	g.GET("/detections/:id/alternatives", c.GetDetectionAlternatives)
 
 	// Protected detection management endpoints

@@ -101,6 +101,40 @@ describe('CompareSounds', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('plays the server-processed clip for the detected species example', async () => {
+    fetchReferenceMock.mockResolvedValue(referenceResult);
+    const { container } = render(CompareSounds, {
+      props: { detection: detection(), isOpen: true, onClose: vi.fn() },
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('reference.compare.yourRecording')).toBeInTheDocument()
+    );
+
+    const example = container.querySelector('audio[src*="reference/clip"]');
+    expect(example).not.toBeNull();
+    expect(example?.getAttribute('src')).toContain('/api/v2/detections/42/reference/clip?rec=1');
+  });
+
+  it('falls back to the raw catalog URL when the processed clip fails to load', async () => {
+    fetchReferenceMock.mockResolvedValue(referenceResult);
+    const { container } = render(CompareSounds, {
+      props: { detection: detection(), isOpen: true, onClose: vi.fn() },
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('reference.compare.yourRecording')).toBeInTheDocument()
+    );
+
+    const example = container.querySelector('audio[src*="reference/clip"]');
+    expect(example).not.toBeNull();
+    await fireEvent.error(example as HTMLAudioElement);
+
+    await waitFor(() =>
+      expect(container.querySelector('audio[src="https://example.test/1.mp3"]')).not.toBeNull()
+    );
+  });
+
   it('marks false positive after choosing a "what seems wrong" reason', async () => {
     fetchReferenceMock.mockResolvedValue(referenceResult);
     render(CompareSounds, {

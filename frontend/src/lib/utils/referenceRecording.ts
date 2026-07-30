@@ -10,6 +10,7 @@
 import { api } from './api';
 import type { AlternativesResult, ReferenceResult } from '$lib/types/detection.types';
 import { loggers } from './logger';
+import { buildAppUrl } from './urlHelpers';
 
 const logger = loggers.ui;
 
@@ -89,4 +90,20 @@ export async function fetchAlternatives(id: number): Promise<AlternativesResult 
 /** Maps a source-provider id to a human-facing label. */
 export function referenceSourceLabel(provider: string | undefined): string {
   return provider === 'xeno-canto' ? 'Xeno-canto' : (provider ?? '');
+}
+
+/**
+ * URL of the server-side cropped + loudness-normalized trusted example for a
+ * detection's *detected* species, so the "Compare sounds" screen plays a short
+ * example at a consistent, audible level. The endpoint derives the source
+ * recording server-side (never trusting a client URL) and is best-effort: it
+ * returns a non-2xx status when it cannot produce a processed clip (feature off,
+ * no ffmpeg, source unavailable), so callers MUST fall back to the raw catalog
+ * `audioUrl` on an audio error. Because the endpoint only knows the detection's
+ * species, it is not used for alternative-species examples.
+ */
+export function processedReferenceClipUrl(detectionId: number, recordingId?: string): string {
+  const base = `/api/v2/detections/${detectionId}/reference/clip`;
+  const path = recordingId ? `${base}?rec=${encodeURIComponent(recordingId)}` : base;
+  return buildAppUrl(path);
 }

@@ -140,6 +140,7 @@ Lightweight connectivity check. Returns a minimal response with no database quer
 | GET    | `/detections/:id/time-of-day` | `GetDetectionTimeOfDay` | ❌   | Detection time context                     |
 | GET    | `/detections/:id/id-check`    | `GetDetectionIDCheck`   | ❌   | Plain-language identification-check verdict |
 | GET    | `/detections/:id/reference`   | `GetDetectionReference` | ❌   | Trusted-example reference recordings (Xeno-canto) |
+| GET    | `/detections/:id/reference/clip` | `GetDetectionReferenceClip` | ❌ | Cropped, loudness-normalized trusted-example audio (best-effort; host-locked to Xeno-canto) |
 | GET    | `/detections/:id/alternatives`| `GetDetectionAlternatives` | ❌ | Plausible alternative species with trusted examples |
 | DELETE | `/detections/:id`             | `DeleteDetection`       | ✅   | Delete detection record                    |
 | POST   | `/detections/:id/review`      | `ReviewDetection`       | ✅   | Review/verify detection                    |

@@ -23,6 +23,7 @@
     fetchReference,
     fetchAlternatives,
     referenceSourceLabel,
+    processedReferenceClipUrl,
   } from '$lib/utils/referenceRecording';
   import { setDetectionVerification } from '$lib/utils/reviewDetection';
   import { createSpectrogramLoader } from '$lib/utils/spectrogramLoader.svelte';
@@ -62,10 +63,33 @@
   let autoPlaying = $state(false);
   let playingWhich = $state<Which | null>(null);
 
+  // The processed (cropped + loudness-normalized) example clip is best-effort;
+  // exampleFellBack flips to true if it fails to load so playback falls back to
+  // the raw catalog URL. Reset whenever the shown example changes.
+  let exampleFellBack = $state(false);
+
   let localAudioUrl = $derived(buildAppUrl(`/api/v2/audio/${detection.id}`));
   let source = $derived(referenceSourceLabel(activeExample?.sourceProvider));
   let canCompare = $derived(!!activeExample?.audioUrl);
   let exampleLabel = $derived(comparingAltName ?? t('reference.title'));
+
+  // Use the server-processed clip only for the detected species' own example
+  // (the endpoint derives it from the detection's species and cannot produce an
+  // alternative species' clip). Alternatives and any fallback use the raw URL.
+  let useProcessedExample = $derived(!!activeExample && !comparingAltName);
+  let exampleAudioSrc = $derived(
+    useProcessedExample && !exampleFellBack && activeExample
+      ? processedReferenceClipUrl(detection.id, activeExample.id)
+      : (activeExample?.audioUrl ?? '')
+  );
+
+  function handleExampleError() {
+    // Best-effort: on any processed-clip load failure, fall back to the raw
+    // catalog URL. Guarded so a failing raw URL does not loop.
+    if (useProcessedExample && !exampleFellBack) {
+      exampleFellBack = true;
+    }
+  }
 
   // Back-to-back sequence: your recording, the example, then once more.
   const SEQUENCE: Which[] = ['local', 'example', 'local', 'example'];
@@ -78,6 +102,7 @@
     reference = null;
     activeExample = null;
     comparingAltName = null;
+    exampleFellBack = false;
     alternatives = [];
     loader.start(detection.id);
     let cancelled = false;
@@ -197,6 +222,7 @@
     stopPlayback();
     activeExample = alt.example ?? null;
     comparingAltName = alt.commonName ?? alt.scientificName;
+    exampleFellBack = false;
     step = 'compare';
   }
 
@@ -204,6 +230,7 @@
     stopPlayback();
     activeExample = reference;
     comparingAltName = null;
+    exampleFellBack = false;
     step = 'compare';
   }
 
@@ -395,7 +422,12 @@
       <!-- Hidden audio elements drive playback -->
       <audio bind:this={localAudio} src={localAudioUrl} preload="none" class="hidden"></audio>
       {#if activeExample?.audioUrl}
-        <audio bind:this={exampleAudio} src={activeExample.audioUrl} preload="none" class="hidden"
+        <audio
+          bind:this={exampleAudio}
+          src={exampleAudioSrc}
+          preload="none"
+          class="hidden"
+          onerror={handleExampleError}
         ></audio>
       {/if}
     </div>
